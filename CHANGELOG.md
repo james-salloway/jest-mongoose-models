@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/Jimsalad/jest-mongoose-models/compare/v1.0.0...v2.0.0) (2021-07-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* :boom: Remove requirement of database name as top level property in requiredModels parameter
+
+* :boom: Remove requirement of database name as top level property in requiredModels parameter ([5021e8a](https://github.com/Jimsalad/jest-mongoose-models/commit/5021e8af9355287a786e42d57e3cef0317fe69e8))
+
 ## 1.0.0 (2021-07-24)
 
 
