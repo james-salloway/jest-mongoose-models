@@ -60,17 +60,15 @@ const buildMongooseModels = (requiredModels) => {
   const keys = Object.keys(requiredModels);
   const models = zipobject(keys, new Array(keys.length).fill({}));
 
-  keys.forEach((db) => {
-    Object.keys(requiredModels[db]).forEach((modelKey) => {
-      const filteredStepKeys = pick(requiredModels[db][modelKey], Object.keys(requiredModels[db][modelKey]).filter((step) => !['useConstructor'].includes(step)));
-      const model = mapCallSteps(filteredStepKeys);
-      const rebuiltModel = convertMappedCallSteps(model);
-      if (get(requiredModels[db][modelKey], 'useConstructor', false)) {
-        models[db][modelKey] = jest.fn(() => rebuiltModel);
-      } else {
-        models[db][modelKey] = rebuiltModel;
-      }
-    });
+  keys.forEach((modelKey) => {
+    const filteredStepKeys = pick(requiredModels[modelKey], Object.keys(requiredModels[modelKey]).filter((step) => !['useConstructor'].includes(step)));
+    const model = mapCallSteps(filteredStepKeys);
+    const rebuiltModel = convertMappedCallSteps(model);
+    if (get(requiredModels[modelKey], 'useConstructor', false)) {
+      models[modelKey] = jest.fn(() => rebuiltModel);
+    } else {
+      models[modelKey] = rebuiltModel;
+    }
   });
 
   return models;
