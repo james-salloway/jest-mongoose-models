@@ -2,11 +2,11 @@
 const buildMongooseModels = require('../src/index');
 
 describe('unit', () => {
-  test.skip('calling without parameters should throw an error', () => {
+  test('calling without parameters should throw an error', () => {
     expect(() => buildMongooseModels()).toThrow('Invalid data type for requiredModels parameter. Expected object, received undefined');
   });
 
-  test.skip('calling with a non object as first parameter should throw an error', () => {
+  test('calling with a non object as first parameter should throw an error', () => {
     expect(() => buildMongooseModels(jest.fn())).toThrow('Invalid data type for requiredModels parameter. Expected object, received function');
     expect(() => buildMongooseModels('string')).toThrow('Invalid data type for requiredModels parameter. Expected object, received string');
     expect(() => buildMongooseModels(100)).toThrow('Invalid data type for requiredModels parameter. Expected object, received number');
@@ -14,7 +14,7 @@ describe('unit', () => {
     expect(() => buildMongooseModels([])).toThrow('Invalid data type for requiredModels parameter. Expected object, received array');
   });
 
-  test.skip('calling with empty object should return empty object', () => {
+  test('calling with empty object should return empty object', () => {
     expect(buildMongooseModels({})).toEqual({});
   });
 
