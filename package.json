@@ -6,7 +6,8 @@
   "homepage": "https://github.com/Jimsalad/jest-mongoose-models#readme",
   "scripts": {
     "test": "jest tests",
-    "release": "standard-version"
+    "release": "standard-version",
+    "benchmark": "node benchmark"
   },
   "author": "James Salloway <james@jmsalloway.co.uk>",
   "license": "MIT",
