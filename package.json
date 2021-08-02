@@ -1,13 +1,14 @@
 {
   "name": "jest-mongoose-models",
   "version": "2.0.0",
-  "description": "",
+  "description": "Jest Mongoose Models",
   "main": "src/index.js",
+  "homepage": "https://github.com/Jimsalad/jest-mongoose-models#readme",
   "scripts": {
     "test": "jest tests",
     "release": "standard-version"
   },
-  "author": "James Salloway",
+  "author": "James Salloway <james@jmsalloway.co.uk>",
   "license": "MIT",
   "dependencies": {
     "lodash.merge": "4.6.2",
@@ -23,5 +24,8 @@
     "eslint-plugin-jest": "^24.4.0",
     "jest": "27.0.6",
     "standard-version": "^9.3.0"
+  },
+  "peerDependencies": {
+    "jest": "^27.0.0"
   }
 }
