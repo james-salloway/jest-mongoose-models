@@ -24,6 +24,9 @@ describe('unit', () => {
         'findOne.lean.exec': {
           split: 'levels',
         },
+        'findOne.exec': {
+          result: 'values',
+        },
       },
     };
 
@@ -39,6 +42,10 @@ describe('unit', () => {
     expect(models.CollectionName.findOne().lean()).toHaveProperty('exec');
     expect(models.CollectionName.findOne().lean().exec.name).toEqual('mockConstructor');
     expect(models.CollectionName.findOne().lean().exec()).toEqual({ split: 'levels' });
+
+    expect(models.CollectionName.findOne()).toHaveProperty('exec');
+    expect(models.CollectionName.findOne().exec.name).toEqual('mockConstructor');
+    expect(models.CollectionName.findOne().exec()).toEqual({ result: 'values' });
   });
 
   test('calling with object that has one level of properties should return properties mapped correctly', () => {
