@@ -13,6 +13,7 @@
     },
     "rules": {
         "max-len": ["error", {"code": 200, "ignoreComments": false }],
-        "linebreak-style": ["error", "windows"]
+        "linebreak-style": ["error", "windows"],
+        "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }]
     }
 }
