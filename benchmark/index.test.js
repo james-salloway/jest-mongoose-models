@@ -19,18 +19,16 @@ function transformObserverEntry(entry) {
   };
 }
 
-module.exports = (function run() {
-  // eslint-disable-next-line no-console
-  const observer = new PerformanceObserver((items) => console.log(items.getEntries().map((entry) => transformObserverEntry(entry))));
-  observer.observe({ entryTypes: ['measure'] });
+// eslint-disable-next-line no-console
+const observer = new PerformanceObserver((items) => console.log(items.getEntries().map((entry) => transformObserverEntry(entry))));
+observer.observe({ entryTypes: ['measure'] });
 
-  performance.mark('iterations');
-  test('benchmark', () => {
-    for (let i = 0; i < COUNT; i++) {
-      buildMongooseModels(modelToMock);
-    }
+performance.mark('iterations');
+test('benchmark', () => {
+  for (let i = 0; i < COUNT; i++) {
+    buildMongooseModels(modelToMock);
+  }
 
-    performance.mark('endIterations');
-    performance.measure('Total', 'iterations', 'endIterations');
-  });
-}());
+  performance.mark('endIterations');
+  performance.measure('Total', 'iterations', 'endIterations');
+});
