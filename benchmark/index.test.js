@@ -9,7 +9,7 @@ const modelToMock = {
   },
 };
 
-const COUNT = 1000000;
+const COUNT = 100000;
 
 function transformObserverEntry(entry) {
   return {
@@ -25,10 +25,12 @@ module.exports = (function run() {
   observer.observe({ entryTypes: ['measure'] });
 
   performance.mark('iterations');
-  for (let i = 0; i < COUNT; i++) {
-    buildMongooseModels(modelToMock);
-  }
+  test('benchmark', () => {
+    for (let i = 0; i < COUNT; i++) {
+      buildMongooseModels(modelToMock);
+    }
 
-  performance.mark('endIterations');
-  performance.measure('Total', 'iterations', 'endIterations');
+    performance.mark('endIterations');
+    performance.measure('Total', 'iterations', 'endIterations');
+  });
 }());

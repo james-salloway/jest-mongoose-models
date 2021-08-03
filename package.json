@@ -7,7 +7,7 @@
   "scripts": {
     "test": "jest tests",
     "release": "standard-version",
-    "benchmark": "node benchmark"
+    "benchmark": "jest benchmark/index.test.js"
   },
   "author": "James Salloway <james@jmsalloway.co.uk>",
   "license": "MIT",
