@@ -1,33 +1,27 @@
 const clone = require('rfdc')();
-const get = require('lodash.get');
-const has = require('lodash.has');
-const pick = require('lodash.pick');
 const merge = require('lodash.merge');
-const zipobject = require('lodash.zipobject');
 
 function convertMappedCallSteps(template) {
-  const step = {};
-  Object.keys(template).forEach((key) => {
+  return Object.keys(template).reduce((step, key) => {
     if (typeof template[key] === 'object') {
-      const children = convertMappedCallSteps(template[key]);
-      step[key] = jest.fn().mockImplementation(() => children);
-    } else {
-      step[key] = template[key];
+      return { ...step, [key]: jest.fn().mockImplementation(() => convertMappedCallSteps(template[key])) };
     }
-  });
 
-  return step;
+    return { ...step, [key]: template[key] };
+  }, {});
 }
 
 function mapCallSteps(model) {
   const mappedModel = {};
-  Object.keys(model).forEach((key) => {
+  const keys = Object.keys(model);
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
     const mappedCall = key.split('.').reverse().reduce((callChain, stepName) => {
       if (Object.keys(callChain).length === 0) {
         const returnValue = model[key];
         const copiedValue = clone(returnValue);
 
-        if (has(returnValue, 'toObject') && returnValue.toObject === true) {
+        if (Object.prototype.hasOwnProperty.call(returnValue, 'toObject') && returnValue.toObject === true) {
           merge(returnValue, { toObject: () => copiedValue });
         }
 
@@ -48,7 +42,7 @@ function mapCallSteps(model) {
     }, {});
 
     merge(mappedModel, mappedCall);
-  });
+  }
 
   return mappedModel;
 }
@@ -57,21 +51,13 @@ const buildMongooseModels = (requiredModels) => {
   if (typeof requiredModels !== 'object' || Array.isArray(requiredModels)) {
     throw new Error(`Invalid data type for requiredModels parameter. Expected object, received ${Array.isArray(requiredModels) ? 'array' : typeof requiredModels}`);
   }
-  const keys = Object.keys(requiredModels);
-  const models = zipobject(keys, new Array(keys.length).fill({}));
 
-  keys.forEach((modelKey) => {
-    const filteredStepKeys = pick(requiredModels[modelKey], Object.keys(requiredModels[modelKey]).filter((step) => !['useConstructor'].includes(step)));
-    const model = mapCallSteps(filteredStepKeys);
+  return Object.keys(requiredModels).reduce((properties, key) => {
+    const { useConstructor, ...pickedStepKeys } = requiredModels[key];
+    const model = mapCallSteps(pickedStepKeys);
     const rebuiltModel = convertMappedCallSteps(model);
-    if (get(requiredModels[modelKey], 'useConstructor', false)) {
-      models[modelKey] = jest.fn(() => rebuiltModel);
-    } else {
-      models[modelKey] = rebuiltModel;
-    }
-  });
-
-  return models;
+    return { ...properties, [key]: useConstructor === true ? jest.fn(() => rebuiltModel) : rebuiltModel };
+  }, {});
 };
 
 module.exports = buildMongooseModels;
