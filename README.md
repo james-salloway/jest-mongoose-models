@@ -57,7 +57,7 @@ The function accepts a single parameter, `requiredModels`, which is expected to 
 
 `requiredModels` is expected to be an object.
 The keys should match the name of each model.
-The values for these keys should be an object containing the relevant methods you would like to mock as the value.
+The values for these keys should be an object containing the relevant methods you would like to mock.
 
 ```javascript
 const models = buildMongooseModels({
@@ -99,9 +99,9 @@ functions (with or without parameters)
 For each method name in a chain, a new mocked method will be generated with the return value as an object containing the succeeding method as a mocked function property.
 This allows you to write assertions based around each individual call in the chain, along with their provided values.
 
-*Mongoose functionality*
+*Mongoose*
 ```javascript
-    ModelName.find({ _id: '000000000000000000000001' }).lean();
+ModelName.find({ _id: '000000000000000000000001' }).lean();
 ```
 
 *Unit test*
@@ -138,7 +138,7 @@ expect(models.ModelName.find().lean().exec()).toEqual('lean exec result');
 
 
 ### isObject
-If you have an `toObject` call that needs mocking, you can set a `toObject` property to `true` as part of the method return value. This `toObject` property will then be converted into a mock function which returns the original value minus the `toObject` parameter.
+If you have a `toObject` call that needs mocking, you can set a `toObject` property to `true` as part of the method return value. This `toObject` property will then be converted into a mock function which returns the original value minus the `toObject` parameter.
 
 ```javascript
 
