@@ -2,10 +2,25 @@ const { PerformanceObserver, performance } = require('perf_hooks');
 const buildMongooseModels = require('../src');
 
 const modelToMock = {
-  Account: {
-    'findOne.lean.exec': { example: 'value', test: 'result', sample: 'data' },
-    findOneAndUpdate: { resultValue: 'completedUpdate' },
-    aggregate: { aggregateComplete: true },
+  ModelName: {
+    findOne: {},
+    findOneAndUpdate: Promise.resolve({}),
+    updateMany: Promise.reject(new Error('Failed to update')),
+    'insertMany.exec': true,
+  },
+  AnotherModelName: {
+    findOne: 'example',
+    'find.lean.exec': 4,
+    insertOne: { toObject: true, result: 'exampleResultValue' },
+    aggregate: [
+      { position: 1 },
+      { position: 2 },
+      { position: 3 },
+    ],
+  },
+  ConstructorBasedModel: {
+    useConstructor: true,
+    'findOne.exec': { result: 'value' },
   },
 };
 

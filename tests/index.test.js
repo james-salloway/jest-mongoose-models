@@ -12,6 +12,9 @@ describe('unit', () => {
     expect(() => buildMongooseModels(100)).toThrow('Invalid data type for requiredModels parameter. Expected object, received number');
     expect(() => buildMongooseModels(true)).toThrow('Invalid data type for requiredModels parameter. Expected object, received boolean');
     expect(() => buildMongooseModels([])).toThrow('Invalid data type for requiredModels parameter. Expected object, received array');
+    expect(() => buildMongooseModels(Promise.resolve())).toThrow('Invalid data type for requiredModels parameter. Expected object, received Promise');
+    expect(() => buildMongooseModels(Promise.reject())).toThrow('Invalid data type for requiredModels parameter. Expected object, received Promise');
+    expect(() => buildMongooseModels(new Promise(() => {}))).toThrow('Invalid data type for requiredModels parameter. Expected object, received Promise');
   });
 
   test('calling with empty object should return empty object', () => {
@@ -20,30 +23,42 @@ describe('unit', () => {
 
   test('calling with object that has multiple levels of properties should return properties mapped correctly', () => {
     const passedObject = {
-      CollectionName: {
+      ModelName: {
         'findOne.lean.exec': {
           split: 'levels',
         },
+        'findOne.exec': {
+          result: 'values',
+        },
+        findOneAndUpdate: null,
       },
     };
 
     const models = buildMongooseModels(passedObject);
 
-    expect(models).toHaveProperty('CollectionName');
-    expect(models).toHaveProperty('CollectionName');
-    expect(models.CollectionName).toHaveProperty('findOne');
+    expect(models).toHaveProperty('ModelName');
+    expect(models).toHaveProperty('ModelName');
+    expect(models.ModelName).toHaveProperty('findOne');
 
-    expect(models.CollectionName.findOne.name).toEqual('mockConstructor');
-    expect(models.CollectionName.findOne()).toHaveProperty('lean');
-    expect(models.CollectionName.findOne().lean.name).toEqual('mockConstructor');
-    expect(models.CollectionName.findOne().lean()).toHaveProperty('exec');
-    expect(models.CollectionName.findOne().lean().exec.name).toEqual('mockConstructor');
-    expect(models.CollectionName.findOne().lean().exec()).toEqual({ split: 'levels' });
+    expect(models.ModelName.findOne.name).toEqual('mockConstructor');
+    expect(models.ModelName.findOne()).toHaveProperty('lean');
+    expect(models.ModelName.findOne().lean.name).toEqual('mockConstructor');
+    expect(models.ModelName.findOne().lean()).toHaveProperty('exec');
+    expect(models.ModelName.findOne().lean().exec.name).toEqual('mockConstructor');
+    expect(models.ModelName.findOne().lean().exec()).toEqual({ split: 'levels' });
+
+    expect(models.ModelName.findOne()).toHaveProperty('exec');
+    expect(models.ModelName.findOne().exec.name).toEqual('mockConstructor');
+    expect(models.ModelName.findOne().exec()).toEqual({ result: 'values' });
+
+    expect(models.ModelName).toHaveProperty('findOneAndUpdate');
+    expect(models.ModelName.findOneAndUpdate.name).toEqual('mockConstructor');
+    expect(models.ModelName.findOneAndUpdate()).toEqual(null);
   });
 
   test('calling with object that has one level of properties should return properties mapped correctly', () => {
     const passedObject = {
-      CollectionName: {
+      ModelName: {
         findOneAndUpdate: {
           updatedData: {
             a: 1,
@@ -56,10 +71,10 @@ describe('unit', () => {
 
     const models = buildMongooseModels(passedObject);
 
-    expect(models).toHaveProperty('CollectionName');
-    expect(models.CollectionName).toHaveProperty('findOneAndUpdate');
-    expect(models.CollectionName.findOneAndUpdate.name).toEqual('mockConstructor');
-    expect(models.CollectionName.findOneAndUpdate()).toEqual({
+    expect(models).toHaveProperty('ModelName');
+    expect(models.ModelName).toHaveProperty('findOneAndUpdate');
+    expect(models.ModelName.findOneAndUpdate.name).toEqual('mockConstructor');
+    expect(models.ModelName.findOneAndUpdate()).toEqual({
       updatedData: {
         a: 1,
         b: 2,
@@ -70,22 +85,37 @@ describe('unit', () => {
 
   test('calling with a function property at collection level should convert the result function into a mocked equivalent', () => {
     const passedObject = {
-      CollectionName: {
+      ModelName: {
         findOneAndUpdate: () => 'Updated Stats',
       },
     };
 
     const models = buildMongooseModels(passedObject);
 
-    expect(models).toHaveProperty('CollectionName');
-    expect(models.CollectionName).toHaveProperty('findOneAndUpdate');
-    expect(models.CollectionName.findOneAndUpdate.name).toEqual('mockConstructor');
-    expect(models.CollectionName.findOneAndUpdate()).toEqual('Updated Stats');
+    expect(models).toHaveProperty('ModelName');
+    expect(models.ModelName).toHaveProperty('findOneAndUpdate');
+    expect(models.ModelName.findOneAndUpdate.name).toEqual('mockConstructor');
+    expect(models.ModelName.findOneAndUpdate()).toEqual('Updated Stats');
+  });
+
+  test('calling with a function property with arguments at collection level should convert the result function into a mocked equivalent', () => {
+    const passedObject = {
+      ModelName: {
+        findOneAndUpdate: (exampleString) => `Updated Stats for ${exampleString}`,
+      },
+    };
+
+    const models = buildMongooseModels(passedObject);
+
+    expect(models).toHaveProperty('ModelName');
+    expect(models.ModelName).toHaveProperty('findOneAndUpdate');
+    expect(models.ModelName.findOneAndUpdate.name).toEqual('mockConstructor');
+    expect(models.ModelName.findOneAndUpdate('Testing value')).toEqual('Updated Stats for Testing value');
   });
 
   test('calling with a useConstructor property at collection level should convert the collection object into a mocked function', () => {
     const passedObject = {
-      CollectionName: {
+      ModelName: {
         useConstructor: true,
         findOneAndUpdate: {
           result: 'Updated Stats',
@@ -95,16 +125,24 @@ describe('unit', () => {
 
     const models = buildMongooseModels(passedObject);
 
-    expect(models).toHaveProperty('CollectionName');
-    expect(models.CollectionName.name).toEqual('mockConstructor');
-    expect(models.CollectionName()).toHaveProperty('findOneAndUpdate');
-    expect(models.CollectionName().findOneAndUpdate.name).toEqual('mockConstructor');
-    expect(models.CollectionName().findOneAndUpdate()).toEqual({ result: 'Updated Stats' });
+    expect(models).toHaveProperty('ModelName');
+    expect(models.ModelName.name).toEqual('mockConstructor');
+    expect(models.ModelName()).toHaveProperty('findOneAndUpdate');
+    expect(models.ModelName().findOneAndUpdate.name).toEqual('mockConstructor');
+    expect(models.ModelName().findOneAndUpdate()).toEqual({ result: 'Updated Stats' });
+
+    // eslint-disable-next-line prefer-destructuring
+    const ConstructorBasedModel = models.ModelName;
+
+    expect(ConstructorBasedModel.name).toEqual('mockConstructor');
+    expect(new ConstructorBasedModel()).toHaveProperty('findOneAndUpdate');
+    expect(new ConstructorBasedModel().findOneAndUpdate.name).toEqual('mockConstructor');
+    expect(new ConstructorBasedModel().findOneAndUpdate()).toEqual({ result: 'Updated Stats' });
   });
 
   test('calling with a toObject property at result level should generate a toObject returnValue that equals the return value', () => {
     const passedObject = {
-      CollectionName: {
+      ModelName: {
         useConstructor: true,
         findOneAndUpdate: {
           toObject: true,
@@ -115,27 +153,33 @@ describe('unit', () => {
 
     const models = buildMongooseModels(passedObject);
 
-    expect(models).toHaveProperty('CollectionName');
-    expect(models.CollectionName.name).toEqual('mockConstructor');
-    expect(models.CollectionName()).toHaveProperty('findOneAndUpdate');
-    expect(models.CollectionName().findOneAndUpdate.name).toEqual('mockConstructor');
-    expect(models.CollectionName().findOneAndUpdate()).toEqual({ toObject: expect.any(Function), result: 'Updated Stats' });
-    expect(typeof models.CollectionName().findOneAndUpdate().toObject).toEqual('function');
-    expect(models.CollectionName().findOneAndUpdate().toObject()).toEqual({ toObject: true, result: 'Updated Stats' });
+    expect(models).toHaveProperty('ModelName');
+    expect(models.ModelName.name).toEqual('mockConstructor');
+    expect(models.ModelName()).toHaveProperty('findOneAndUpdate');
+    expect(models.ModelName().findOneAndUpdate.name).toEqual('mockConstructor');
+    expect(models.ModelName().findOneAndUpdate()).toEqual({ toObject: expect.any(Function), result: 'Updated Stats' });
+    expect(typeof models.ModelName().findOneAndUpdate().toObject).toEqual('function');
+    expect(models.ModelName().findOneAndUpdate().toObject()).toEqual({ result: 'Updated Stats' });
   });
 
   test('calling with a Promise based function property at collection level should convert the result function into a mocked equivalent', async () => {
     const passedObject = {
-      CollectionName: {
+      ModelName: {
         findOneAndUpdate: Promise.resolve('Updated Stats'),
+        findOne: Promise.reject(new Error('Failed to find data')),
       },
     };
 
     const models = buildMongooseModels(passedObject);
 
-    expect(models).toHaveProperty('CollectionName');
-    expect(models.CollectionName).toHaveProperty('findOneAndUpdate');
-    expect(models.CollectionName.findOneAndUpdate.name).toEqual('mockConstructor');
-    expect(await models.CollectionName.findOneAndUpdate()).toEqual('Updated Stats');
+    expect(models).toHaveProperty('ModelName');
+
+    expect(models.ModelName).toHaveProperty('findOneAndUpdate');
+    expect(models.ModelName.findOneAndUpdate.name).toEqual('mockConstructor');
+    expect(await models.ModelName.findOneAndUpdate()).toEqual('Updated Stats');
+
+    expect(models.ModelName).toHaveProperty('findOne');
+    expect(models.ModelName.findOne.name).toEqual('mockConstructor');
+    await models.ModelName.findOne().catch((e) => expect(e.message).toEqual('Failed to find data'));
   });
 });

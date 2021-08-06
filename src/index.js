@@ -19,14 +19,18 @@ function mapCallSteps(model) {
     const mappedCall = key.split('.').reverse().reduce((callChain, stepName) => {
       if (Object.keys(callChain).length === 0) {
         const returnValue = model[key];
-        const copiedValue = clone(returnValue);
+        if (returnValue === null) {
+          return { [stepName]: jest.fn().mockReturnValue(null) };
+        }
 
-        if (Object.prototype.hasOwnProperty.call(returnValue, 'toObject') && returnValue.toObject === true) {
+        const { toObject, ...copiedValue } = clone(returnValue);
+
+        if (toObject === true) {
           merge(returnValue, { toObject: () => copiedValue });
         }
 
         if (returnValue instanceof Promise) {
-          return { [stepName]: jest.fn().mockResolvedValue(returnValue) };
+          return { [stepName]: jest.fn().mockImplementation(() => returnValue) };
         }
 
         if (typeof returnValue === 'function') {
@@ -48,8 +52,19 @@ function mapCallSteps(model) {
 }
 
 const buildMongooseModels = (requiredModels) => {
-  if (typeof requiredModels !== 'object' || Array.isArray(requiredModels)) {
-    throw new Error(`Invalid data type for requiredModels parameter. Expected object, received ${Array.isArray(requiredModels) ? 'array' : typeof requiredModels}`);
+  const isPromise = requiredModels instanceof Promise;
+  const isArray = Array.isArray(requiredModels);
+  if (isPromise || typeof requiredModels !== 'object' || isArray) {
+    let returnType = typeof requiredModels;
+    if (isPromise) {
+      returnType = 'Promise';
+    }
+
+    if (isArray) {
+      returnType = 'array';
+    }
+
+    throw new Error(`Invalid data type for requiredModels parameter. Expected object, received ${returnType}`);
   }
 
   return Object.keys(requiredModels).reduce((properties, key) => {
