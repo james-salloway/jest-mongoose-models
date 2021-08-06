@@ -1,6 +1,6 @@
 {
   "name": "jest-mongoose-models",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Jest Mongoose Models",
   "main": "src/index.js",
   "homepage": "https://github.com/Jimsalad/jest-mongoose-models#readme",
