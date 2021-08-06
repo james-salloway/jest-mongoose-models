@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/Jimsalad/jest-mongoose-models/compare/v2.0.0...v2.1.0) (2021-08-06)
+
+
+### Features
+
+* :sparkles: Add support for null values and all promise based values; Add stricter parameter type checking ([39c75bc](https://github.com/Jimsalad/jest-mongoose-models/commit/39c75bc5f204d3080aca71f3ea7a32ca3a9d9b0a))
+
 ## [2.0.0](https://github.com/Jimsalad/jest-mongoose-models/compare/v1.0.0...v2.0.0) (2021-07-25)
 
 
