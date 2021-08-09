@@ -10,7 +10,7 @@ This package provides a function to generate mock [Mongoose](https://mongoosejs.
 ```javascript
 import buildMongooseModels from 'jest-mongoose-models';
 
-buldMongooseModels({
+buildMongooseModels({
     ModelName: {
         find: 'expected result'
     }
