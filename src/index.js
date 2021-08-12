@@ -4,7 +4,7 @@ const merge = require('lodash.merge');
 function convertMappedCallSteps(template) {
   return Object.keys(template).reduce((step, key) => {
     if (typeof template[key] === 'object') {
-      return { ...step, [key]: jest.fn().mockImplementation(() => convertMappedCallSteps(template[key])) };
+      return { ...step, [key]: jest.fn().mockReturnValue(convertMappedCallSteps(template[key])) };
     }
 
     return { ...step, [key]: template[key] };
