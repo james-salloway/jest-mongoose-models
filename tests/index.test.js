@@ -7,13 +7,13 @@ describe('unit', () => {
   });
 
   test('calling with a non object as first parameter should throw an error', () => {
+    expect(() => buildMongooseModels()).toThrow('Invalid data type for requiredModels parameter. Expected object, received undefined');
     expect(() => buildMongooseModels(jest.fn())).toThrow('Invalid data type for requiredModels parameter. Expected object, received function');
     expect(() => buildMongooseModels('string')).toThrow('Invalid data type for requiredModels parameter. Expected object, received string');
     expect(() => buildMongooseModels(100)).toThrow('Invalid data type for requiredModels parameter. Expected object, received number');
     expect(() => buildMongooseModels(true)).toThrow('Invalid data type for requiredModels parameter. Expected object, received boolean');
     expect(() => buildMongooseModels([])).toThrow('Invalid data type for requiredModels parameter. Expected object, received array');
     expect(() => buildMongooseModels(Promise.resolve())).toThrow('Invalid data type for requiredModels parameter. Expected object, received Promise');
-    expect(() => buildMongooseModels(Promise.reject())).toThrow('Invalid data type for requiredModels parameter. Expected object, received Promise');
     expect(() => buildMongooseModels(new Promise(() => {}))).toThrow('Invalid data type for requiredModels parameter. Expected object, received Promise');
   });
 
@@ -181,5 +181,21 @@ describe('unit', () => {
     expect(models.ModelName).toHaveProperty('findOne');
     expect(models.ModelName.findOne.name).toEqual('mockConstructor');
     await models.ModelName.findOne().catch((e) => expect(e.message).toEqual('Failed to find data'));
+  });
+
+  // https://github.com/Jimsalad/jest-mongoose-models/issues/5
+  test('calling with an explicit value of undefined should be handled properly', () => {
+    const passedObject = {
+      ModelName: {
+        'findOne.exec': undefined,
+      },
+    };
+
+    const models = buildMongooseModels(passedObject);
+    expect(models.ModelName).toHaveProperty('findOne');
+    expect(models.ModelName.findOne.name).toEqual('mockConstructor');
+    expect(models.ModelName.findOne()).toHaveProperty('exec');
+    expect(models.ModelName.findOne().exec.name).toEqual('mockConstructor');
+    expect(models.ModelName.findOne().exec()).toEqual(undefined);
   });
 });
