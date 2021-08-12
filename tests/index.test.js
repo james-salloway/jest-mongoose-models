@@ -198,4 +198,19 @@ describe('unit', () => {
     expect(models.ModelName.findOne().exec.name).toEqual('mockConstructor');
     expect(models.ModelName.findOne().exec()).toEqual(undefined);
   });
+
+  // https://github.com/Jimsalad/jest-mongoose-models/issues/6
+  test('calling with a mocked function should return mocked function argument value as provided', () => {
+    const passedObject = {
+      ModelName: {
+        create: jest.fn((returnValue) => returnValue),
+      },
+    };
+
+    const models = buildMongooseModels(passedObject);
+    const callValue = { valueA: 'a', valueB: 'b', valueNum: 12 };
+    expect(models.ModelName).toHaveProperty('create');
+    expect(models.ModelName.create.name).toEqual('mockConstructor');
+    expect(models.ModelName.create(callValue)).toEqual(callValue);
+  });
 });
