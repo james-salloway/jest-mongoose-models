@@ -199,8 +199,8 @@ describe('unit', () => {
     expect(models.ModelName.findOne().exec()).toEqual(undefined);
   });
 
-  // https://github.com/Jimsalad/jest-mongoose-models/issues/6
-  test('calling with a mocked function should return mocked function argument value as provided', () => {
+  // https://github.com/Jimsalad/jest-mongoose-models/issues/7
+  test('calling with a mocked function should return mocked function argument value as implemented', () => {
     const passedObject = {
       ModelName: {
         create: jest.fn((returnValue) => returnValue),
@@ -212,5 +212,55 @@ describe('unit', () => {
     expect(models.ModelName).toHaveProperty('create');
     expect(models.ModelName.create.name).toEqual('mockConstructor');
     expect(models.ModelName.create(callValue)).toEqual(callValue);
+  });
+
+  test('calling with a nested mocked function should return mocked function argument values as implemented', () => {
+    const passedObject = {
+      ModelName: {
+        create: jest.fn((returnValue) => ({ ...returnValue, exec: (nestedReturnValue) => nestedReturnValue })),
+      },
+    };
+
+    const models = buildMongooseModels(passedObject);
+    const callValue = { valueA: 'a', valueB: 'b', valueNum: 12 };
+    expect(models.ModelName).toHaveProperty('create');
+    expect(models.ModelName.create.name).toEqual('mockConstructor');
+    expect(models.ModelName.create(callValue)).toEqual({ ...callValue, exec: expect.any(Function) });
+    expect(models.ModelName.create(callValue).exec.name).toEqual('exec');
+    expect(models.ModelName.create(callValue).exec('Test Test')).toEqual('Test Test');
+  });
+
+  // https://github.com/Jimsalad/jest-mongoose-models/issues/9
+  test('calling with a multi step call chain should allow assertions with arguments on the intemediary chain step', () => {
+    const passedObject = {
+      ModelName: {
+        'find.populate.exec': [
+          { _id: 1 },
+          { _id: 2 },
+          { _id: 3 },
+          { _id: 4 },
+        ],
+      },
+    };
+
+    const models = buildMongooseModels(passedObject);
+    expect(models.ModelName).toHaveProperty('find');
+    expect(models.ModelName.find.name).toEqual('mockConstructor');
+    expect(models.ModelName.find()).toHaveProperty('populate');
+    expect(models.ModelName.find().populate.name).toEqual('mockConstructor');
+    expect(models.ModelName.find().populate()).toHaveProperty('exec');
+    expect(models.ModelName.find().populate().exec.name).toEqual('mockConstructor');
+    expect(models.ModelName.find().populate().exec()).toEqual([
+      { _id: 1 },
+      { _id: 2 },
+      { _id: 3 },
+      { _id: 4 },
+    ]);
+
+    models.ModelName.find('call value one').populate('call value two').exec();
+
+    expect(models.ModelName.find).toHaveBeenCalledWith('call value one');
+    expect(models.ModelName.find().populate).toHaveBeenCalledWith('call value two');
+    expect(models.ModelName.find().populate().exec).toHaveBeenCalledWith();
   });
 });
