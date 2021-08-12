@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/Jimsalad/jest-mongoose-models/compare/v2.1.1...v3.0.0) (2021-08-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* :boom: Switch convertMappedCallSteps to use mockReturnValue instead of mockImplementation
+
+### Bug Fixes
+
+* :boom: Switch convertMappedCallSteps to use mockReturnValue instead of mockImplementation ([5a21590](https://github.com/Jimsalad/jest-mongoose-models/commit/5a215900196117734e775ee8ace8ccbc3d49eb18))
+* :bug: Handle explicit return value passed in as undefined ([c39702a](https://github.com/Jimsalad/jest-mongoose-models/commit/c39702a244875f0da8f12ab6f0ff5fc1cbb3e8e4))
+* :bug: Handle mock functions with arguments as call chain values not returning correctly ([7ace9a0](https://github.com/Jimsalad/jest-mongoose-models/commit/7ace9a09a75ab1762b0b725608f8bec69e493865))
+
 ### [2.1.1](https://github.com/Jimsalad/jest-mongoose-models/compare/v2.1.0...v2.1.1) (2021-08-09)
 
 ## [2.1.0](https://github.com/Jimsalad/jest-mongoose-models/compare/v2.0.0...v2.1.0) (2021-08-06)
