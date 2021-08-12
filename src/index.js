@@ -39,7 +39,7 @@ function mapCallSteps(model) {
 
         if (typeof returnValue === 'function') {
           return {
-            [stepName]: jest.fn().mockImplementation((...args) => returnValue(args)),
+            [stepName]: returnValue.name === 'mockConstructor' ? returnValue : jest.fn().mockImplementation((...args) => returnValue(args)),
           };
         }
 
