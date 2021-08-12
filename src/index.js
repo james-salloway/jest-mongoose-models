@@ -19,6 +19,10 @@ function mapCallSteps(model) {
     const mappedCall = key.split('.').reverse().reduce((callChain, stepName) => {
       if (Object.keys(callChain).length === 0) {
         const returnValue = model[key];
+        if (typeof returnValue === 'undefined') {
+          return { [stepName]: jest.fn().mockReturnValue() };
+        }
+
         if (returnValue === null) {
           return { [stepName]: jest.fn().mockReturnValue(null) };
         }
